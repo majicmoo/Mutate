@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Mutate</title>
+    {{include 'web2py_ajax.html'}}
+    <meta name="description" content="">
+    <link rel ="stylesheet" type ="text/css" href="{{=URL('static','css/bootstrap.min.css')}}"  media="screen" >
+    <link rel ="stylesheet" type ="text/css" href="{{=URL('static','css/bootstrap-responsive.min.css')}}"  media="screen" >
+    <link rel ="stylesheet" type ="text/css" href="{{=URL('static','css/web2py_bootstrap.css')}}"  media="screen" >
+    <link rel="stylesheet" type="text/css" href="{{=URL('static','css/mutate.css')}}" media="screen" >
+    <script type="text/javascript" src="{{=URL('static','js/jquery.js')}}"></script>
+    <script type="text/javascript" src="{{=URL('static','js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript" src="{{=URL('static','js/web2py.js')}}"></script>
+</head>
+<body>
+<div class="container" id="main-wrapper">
+    <header class="row">
+        <div class="span12">
+            <nav class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right">
+                                 <li><a href ="{{=URL('default', 'mutateprojects.html')}}">mutate projects</a></li>
+                                <li class="divider-vertical"></li>
+                                <li><a href ="{{=URL('default', 'about.html')}}">about</a></li>
+                                <li class="divider-vertical" ></li>
+                                {{if auth.is_logged_in():}}
+                                <li><a href={{=URL('default','user/logout')}}>logout</a></li>
+                                <li class="divider-vertical" ></li>
+                                <li><a href ="{{=URL('default','currentsearches.html')}}">current searches</a></li>
+                                {{else:}}
+                                <li><a href ="{{=URL('default','login.html')}}">login</a></li>
+                                <li class="divider-vertical" ></li>
+                                <li><a href ="{{=URL('default','register.html')}}">register</a></li>
+
+                                {{pass}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
+    <div class="row below-nav" id="main-content">
+        <div class="span12">
+            {{include}}
+            {{pass}}
+        </div>
+    </div>
+
+    <footer class="row">
+    </footer>
+
+</div>
+
+</body>
+</html>

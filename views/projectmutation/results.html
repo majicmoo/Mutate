@@ -1,0 +1,14 @@
+{{extend 'layout.html'}}
+    <script type="text/javascript" src="{{=URL('static','js/polling.js')}}"></script>
+    <script>timedRefresh(5000)</script>
+
+
+<div id="result">
+    {{=results}}
+    {{if temp is  not None:}}
+        {{for i in temp:}}
+            {{=i}}
+    {{pass}}
+</div>
+
+
