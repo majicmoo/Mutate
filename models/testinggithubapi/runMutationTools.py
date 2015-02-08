@@ -35,26 +35,20 @@ class RunMutationTools(object):
         subprocess.call("git clone "+self.project.clone+" "+self.path_cloned_repos+"/"+str(max_file_number+1),
                         shell=True)
         return self.path_cloned_repos+"/"+str(max_file_number+1)
-        #pass
-
-    # def remove_readonly(func, path, excinfo):
-    #     os.chmod(path, stat.S_IWRITE)
-    #     func(path)
 
     def run_mvn(self, current_file):
         pom = self.find_pom(current_file)
         print "DEBUG: Running tests for ", current_file
         print "mvn -f " + str(pom) + " test"
-        #checkoutput if mvn tests fail delete folder
-
+        # checkoutput if mvn tests fail delete folder
         try:
             temp = subprocess.check_output("mvn -f " + pom + " test", shell=True)
             temp = temp.split("\n")
             num = '1234567890'
-            tests_run, failures, errors, skipped = 0,0,0,0
+            tests_run, failures, errors, skipped = 0, 0, 0, 0
             for i in temp:
                 if "Tests run:" in i:
-                    i=i.split(",")
+                    i = i.split(",")
                     tests_run, failures, errors, skipped = int("".join([c for c in i[0] if c in num])),\
                                                            int("".join([c for c in i[1] if c in num])),\
                                                            int("".join([c for c in i[2] if c in num])),\
@@ -89,7 +83,7 @@ class RunMutationTools(object):
                     return root+"/"+i
 
     def find_mutation_targets(self, pom):
-        directory =  os.path.dirname(pom)
+        directory = os.path.dirname(pom)
         test = directory + '/' + 'src' + '/' + 'test'
         for root, dirnames, files in os.walk(test):
             for i in files:
@@ -109,29 +103,27 @@ class RunMutationTools(object):
         test = test[:-1]+'*'
         return test
 
-
-
-
-
-
-
-
-
-
-    def run_pit(self,current_file):
+    def run_pit(self, current_file):
         pom = self.find_pom(current_file)
         target_program = self.find_mutation_targets(str(pom))
         xml_converter = ConvertXML()
         xml_converter.convert_pom(target_program, target_program, pom)
         print "DEBUG: running pit"
-        pittest = subprocess.check_output("mvn org.pitest:pitest-maven:mutationCoverage")
-        pittest = pittest.split('\n')
-        for i in pittest:
-            if 'BUILD SUCCESS' in i:
-                return True
-        return False
-
-
+        try:
+            pittest = subprocess.check_output("mvn org.pitest:pitest-maven:mutationCoverage -f " + pom)
+            pittest = pittest.split('\n')
+            for i in pittest:
+                if 'BUILD SUCCESS' in i:
+                    return True
+            print "DEBUG: Pit Failed"
+            print "DEBUG: Deleting", current_file
+            shutil.rmtree(current_file, onerror=rem_shut)
+            return False
+        except subprocess.CalledProcessError:
+            print "DEBUG: Pit Failed"
+            print "DEBUG: Deleting", current_file
+            shutil.rmtree(current_file, onerror=rem_shut)
+            return False
 
     def setup_repo(self, mutation_tool_name):
         # Clone repo
@@ -141,8 +133,5 @@ class RunMutationTools(object):
         if self.run_mvn(current_file):
             if str(mutation_tool_name) == "pit":
                 return self.run_pit(current_file)
-        else:            return False
-
-
-
-
+        else:
+            return False
