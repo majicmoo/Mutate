@@ -2,7 +2,8 @@ import os
 import subprocess
 import shutil
 import stat  # needed for file stat
-import xml.etree.ElementTree as ET
+from applications.Mutate.models.testinggithubapi.mavenXMLConverter import ConvertXML
+from applications.Mutate.models.testinggithubapi.project import Project
 
 
 def rem_shut(*args):
@@ -87,20 +88,61 @@ class RunMutationTools(object):
                     self.project.pom_location = root+"/"+i
                     return root+"/"+i
 
+    def find_mutation_targets(self, pom):
+        directory =  os.path.dirname(pom)
+        test = directory + '/' + 'src' + '/' + 'test'
+        for root, dirnames, files in os.walk(test):
+            for i in files:
+                test = root
+        file_list = []
+        for i in test.split('\\'):
+            for j in i.split('/'):
+                file_list.append(j)
+        print file_list
+        after_java = False
+        test = ""
+        for i in file_list:
+            if after_java:
+                test += i+"."
+            if str(i) == 'java':
+                after_java = True
+        test = test[:-1]+'*'
+        return test
+
+
+
+
+
+
+
+
+
+
     def run_pit(self,current_file):
         pom = self.find_pom(current_file)
-        tree = ET.parse(pom)
-        root = tree.getroot()
+        target_program = self.find_mutation_targets(str(pom))
+        xml_converter = ConvertXML()
+        xml_converter.convert_pom(target_program, target_program, pom)
+        print "DEBUG: running pit"
+        pittest = subprocess.check_output("mvn org.pitest:pitest-maven:mutationCoverage")
+        pittest = pittest.split('\n')
+        for i in pittest:
+            if 'BUILD SUCCESS' in i:
+                return True
+        return False
 
-        # Run Pit
-        # Add plugin to build plugins in pom
 
-        # mvn -f pom org.pitest-maven:mutationCoverage
-        pass
 
-    def setup_repo(self):
+    def setup_repo(self, mutation_tool_name):
         # Clone repo
         current_file = self.clone_repo()
         # run tests
         print "*******************************************"
-        return self.run_mvn(current_file)
+        if self.run_mvn(current_file):
+            if str(mutation_tool_name) == "pit":
+                return self.run_pit(current_file)
+        else:            return False
+
+
+
+

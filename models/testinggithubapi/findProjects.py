@@ -111,13 +111,14 @@ class FindProjects(object):
                         print "*******************************************"
                         repository_storage.append(temp_project)
                         # Add repository to database
+                        print "Appending", temp_project.name,"to project descriptors file"
                         with open(CLONED_REPOS_PATH+'/'+str(task)+'/'+'projectdescriptors.txt', "a") as myfile:
-                            myfile.write('Name: '+ str(temp_project.name) + '\n'+
-                                           'Clone URL: '+ str(temp_project.clone) + '\n'+
-                                           'Language: '+ str(temp_project.language)+ '\n'+
-                                           'URL: '+ str(temp_project.url)+ '\n'+
-                                           'Size: '+ str(temp_project.size) + '\n'+
-                                           'Pom Location: ' + str(temp_project.pom_location) + '\n')
+                            myfile.write(str(temp_project.name) + '\n'+
+                                           str(temp_project.clone[:-4]) + '\n'+
+                                           str(temp_project.language)+ '\n'+
+                                           str(temp_project.url)+ '\n'+
+                                           str(temp_project.size) + '\n'+
+                                           str(temp_project.pom_location) + '\n')
 
 
 

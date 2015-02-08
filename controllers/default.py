@@ -70,7 +70,7 @@ def mutateprojects():
                                                         minsize=int(request.vars.min_repo_size),
                                                         language=request.vars.language.lower(), sortby=order_by,
                                                         orderby=asc_desc, number_of_projects=int(request.vars.no_results),
-                                                        username=username, token=session.token) ,timeout=99999)
+                                                        username=username, token=session.token) ,timeout=9999)
         print 'task', task.id, 'started'
 
 
@@ -119,8 +119,12 @@ def login():
         session.token = request.vars.token
         session.search=[]
         user=db(db.auth_user.username==request.vars.username).select().first()
-        auth.login_user(user=user)
-        redirect(location=URL('default','index.html'))
+        if user is None:
+            session.flash = H1('Please Register')
+            redirect(location=URL('default','register.html'))
+        else:
+            auth.login_user(user=user)
+            redirect(location=URL('default','index.html'))
 
         # test = authenticate.Authenticate()
         # token = test.check_authentication(request.vars.username, request.vars.password, None)
