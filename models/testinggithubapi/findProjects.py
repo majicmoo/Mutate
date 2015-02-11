@@ -18,6 +18,7 @@ db = current.globalenv['db']
 
 from applications.Mutate.models.testinggithubapi.runMutationTools import RunMutationTools
 from applications.Mutate.models.testinggithubapi.project import Project
+from applications.Mutate.models.testinggithubapi.githubFunctions import GithubFunctions
 
 
 class FindProjects(object):
@@ -28,8 +29,31 @@ class FindProjects(object):
         self.count_github_access = 0
 
     def search_for_projects(self, keyword, maxsize, minsize, language, sortby,
-                      orderby, number_of_projects, username, token, task):
-        pass
+                      orderby, number_of_projects, username, token, task, source_forge, mutation_tool):
+
+        if source_forge == "Github":
+            GithubFunctions().search_github(self, keyword, maxsize, minsize, language, sortby,
+                      orderby, number_of_projects, username, token, mutation_tool)
+
+
+
+
+
+        else:
+            print "DEBUG:", source_forge, "is not supported."
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def search_github(self, keyword, maxsize, minsize, language, sortby,
                       orderby, number_of_projects, username, token, task):
