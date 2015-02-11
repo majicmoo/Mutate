@@ -1,7 +1,7 @@
-import time
-import requests
+__author__ = 'Megan'
 import os
-
+import requests
+import time
 
 GITHUB_API = 'https://api.github.com'
 MAX_ITEMS = 30  # max number of items on each page in github
@@ -13,22 +13,9 @@ MAX_JUNIT_TESTS = 40
 MIN_JUNIT_TESTS = 0
 
 
-from gluon import current
-db = current.globalenv['db']
-
-from applications.Mutate.models.testinggithubapi.runMutationTools import RunMutationTools
-from applications.Mutate.models.testinggithubapi.project import Project
-
-
-class FindProjects(object):
+class GithubFunctions(object):
 
     def __init__(self):
-        # languages accepted
-        self.languages = ["python", "java", "ruby", "c"]
-        self.count_github_access = 0
-
-    def search_for_projects(self, keyword, maxsize, minsize, language, sortby,
-                      orderby, number_of_projects, username, token, task):
         pass
 
     def search_github(self, keyword, maxsize, minsize, language, sortby,

@@ -2,14 +2,31 @@ import os
 import subprocess
 import shutil
 import stat  # needed for file stat
+import sys
 from applications.Mutate.models.testinggithubapi.mavenXMLConverter import ConvertXML
-from applications.Mutate.models.testinggithubapi.project import Project
+from applications.Mutate.models.testinggithubapi.pit import Pit
+
+# from applications.Mutate.models.testinggithubapi.project import Project
 
 
-def rem_shut(*args):
-    func, path, _ = args  # onerror returns a tuple containing function, path and     exception info
-    os.chmod(path, stat.S_IWRITE)
-    os.remove(path)
+def onerror(func, path, exc_info):
+    """
+    Error handler for ``shutil.rmtree``.
+
+    If the error is due to an access error (read only file)
+    it attempts to add write permission and then retries.
+
+    If the error is for another reason it re-raises the error.
+
+    Usage : ``shutil.rmtree(path, onerror=onerror)``
+    """
+    import stat
+    if not os.access(path, os.W_OK):
+        # Is the error an access error ?
+        os.chmod(path, stat.S_IWUSR)
+        func(path)
+    else:
+        raise
 
 
 class RunMutationTools(object):
@@ -17,6 +34,16 @@ class RunMutationTools(object):
     def __init__(self, project, path_cloned_repos):
         self.project = project
         self.path_cloned_repos = path_cloned_repos
+
+    def delete_repo(self, current_file):
+        print "DEBUG: Deleting", current_file
+        shutil.rmtree(current_file, onerror=onerror)
+
+        # if 'win' in str(sys.platform):
+        #     shutil.rmtree(os.path.join(os.getcwd(),current_file), onerror=onerror)
+        # else:
+        #     shutil.rmtree(current_file, onerror=onerror)
+
 
     def clone_repo(self):
         # create folder to clone into
@@ -26,15 +53,15 @@ class RunMutationTools(object):
             if len(temp) > 0:
                 max_file_number = max(temp)
             break
-        print "DEBUG: Make directory: " + self.path_cloned_repos+"/"+str(max_file_number+1)
+        print "DEBUG: Make directory: " + self.path_cloned_repos+os.sep+str(max_file_number+1)
 
-        os.makedirs(self.path_cloned_repos+"/"+str(max_file_number+1))
-        print self.path_cloned_repos+"/"+str(max_file_number+1)
+        os.makedirs(self.path_cloned_repos+os.sep+str(max_file_number+1))
+        print self.path_cloned_repos+os.sep+str(max_file_number+1)
         # clone repo
-        print "DEBUG: Cloning", self.project.name, "into", self.path_cloned_repos+"/"+str(max_file_number+1)
-        subprocess.call("git clone "+self.project.clone+" "+self.path_cloned_repos+"/"+str(max_file_number+1),
+        print "DEBUG: Cloning", self.project.name, "into", self.path_cloned_repos+os.sep+str(max_file_number+1)
+        subprocess.call("git clone "+self.project.clone+" "+self.path_cloned_repos+os.sep+str(max_file_number+1),
                         shell=True)
-        return self.path_cloned_repos+"/"+str(max_file_number+1)
+        return self.path_cloned_repos+os.sep+str(max_file_number+1)
 
     def run_mvn(self, current_file):
         pom = self.find_pom(current_file)
@@ -58,20 +85,17 @@ class RunMutationTools(object):
 
             if tests_run == 0:
                 print "DEBUG: No tests run"
-                print "DEBUG: Deleting", current_file
-                shutil.rmtree(current_file, onerror=rem_shut)
+                self.delete_repo(current_file)
 
             if failures > 0:
                 print "DEBUG: Test suite not green"
-                print "DEBUG: Deleting", current_file
-                shutil.rmtree(current_file, onerror=rem_shut)
+                self.delete_repo(current_file)
 
             print "DEBUG: Test Successful"
             return True
         except subprocess.CalledProcessError:
             print "DEBUG: Test Failed"
-            print "DEBUG: Deleting", current_file
-            shutil.rmtree(current_file, onerror=rem_shut)
+            self.delete_repo(current_file)
             return False
 
     def find_pom(self, current_file):
@@ -79,12 +103,12 @@ class RunMutationTools(object):
         for root, dirnames, files in os.walk(current_file):
             for i in files:
                 if i == 'pom.xml':
-                    self.project.pom_location = root+"/"+i
-                    return root+"/"+i
+                    self.project.pom_location = root+os.sep+i
+                    return root+os.sep+i
 
     def find_mutation_targets(self, pom):
         directory = os.path.dirname(pom)
-        test = directory + '/' + 'src' + '/' + 'test'
+        test = directory + os.sep + 'src' + os.sep + 'test'
         for root, dirnames, files in os.walk(test):
             for i in files:
                 test = root
@@ -110,19 +134,19 @@ class RunMutationTools(object):
         xml_converter.convert_pom(target_program, target_program, pom)
         print "DEBUG: running pit"
         try:
-            pittest = subprocess.check_output("mvn org.pitest:pitest-maven:mutationCoverage -f " + pom)
+            print os.getcwd()
+            print "mvn org.pitest:pitest-maven:mutationCoverage -f " + pom
+            pittest = subprocess.check_output("mvn org.pitest:pitest-maven:mutationCoverage -f " + pom, shell=True)
             pittest = pittest.split('\n')
             for i in pittest:
                 if 'BUILD SUCCESS' in i:
                     return True
             print "DEBUG: Pit Failed"
-            print "DEBUG: Deleting", current_file
-            shutil.rmtree(current_file, onerror=rem_shut)
+            self.delete_repo(current_file)
             return False
         except subprocess.CalledProcessError:
             print "DEBUG: Pit Failed"
-            print "DEBUG: Deleting", current_file
-            shutil.rmtree(current_file, onerror=rem_shut)
+            self.delete_repo(current_file)
             return False
 
     def setup_repo(self, mutation_tool_name):
@@ -130,8 +154,24 @@ class RunMutationTools(object):
         current_file = self.clone_repo()
         # run tests
         print "*******************************************"
-        if self.run_mvn(current_file):
+        if self.run_mvn(str(current_file)):
             if str(mutation_tool_name) == "pit":
-                return self.run_pit(current_file)
+                return self.run_pit(str(current_file))
+        else:
+            return False
+
+    def temp(self, mutation_tool_name):
+        # Clone repo
+        current_file = self.clone_repo()
+        pom = self.find_pom(current_file)
+        # run tests
+        print "*******************************************"
+        if self.run_mvn(str(current_file)):
+            if str(mutation_tool_name) == "pit":
+                pit = Pit()
+                if not pit.run(str(current_file), pom):
+                    self.delete_repo(current_file)
+                else:
+                    return True
         else:
             return False

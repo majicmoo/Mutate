@@ -70,7 +70,7 @@ def mutateprojects():
                                                         minsize=int(request.vars.min_repo_size),
                                                         language=request.vars.language.lower(), sortby=order_by,
                                                         orderby=asc_desc, number_of_projects=int(request.vars.no_results),
-                                                        username=username, token=session.token) ,timeout=9999)
+                                                        username=username, token=session.token) ,timeout=560)
         print 'task', task.id, 'started'
 
 
