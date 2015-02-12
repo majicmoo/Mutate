@@ -10,11 +10,8 @@ ElementTree.register_namespace("", "http://maven.apache.org/POM/4.0.0")
 
 class ConvertXML(object):
 
-    def __init__(self):
-        pass
-
-    def convert_pom(self, mutate, test, pom):
-
+    @staticmethod
+    def convert_pom(mutate, test, pom):
         tree = ElementTree.parse(pom)
         root = tree.getroot()
 
@@ -30,8 +27,7 @@ class ConvertXML(object):
             print 'i', i
             for j in i:
                 print j.text
-                #print'test', j.text.split('.')[0]
-
+                # print 'test', j.text.split('.')[0]
                 version = j.text.split('.')[0]
                 try:
                     version = int(version)
@@ -56,8 +52,7 @@ class ConvertXML(object):
                 i.append(dependency)
 
         # Add pit
-        #find if build exists
-
+        # Find if build exists
         build_exists = False
         for i in tree.iter('%sbuild' % POM_NS):
             build_exists = True
@@ -70,14 +65,14 @@ class ConvertXML(object):
 
         if not plugins_exists:
             if not build_exists:
-                #create build
+                # Create build
                 print "DEBUG: build and plugins do not exist, adding"
                 build = ElementTree.Element('%sbuild' % POM_NS)
                 ElementTree.SubElement(build, '%splugins' % POM_NS)
                 for i in root.iter('%sproject' % POM_NS):
                     i.append(build)
             else:
-                #build exists
+                # Build exists
                 print "DEBUG: plugins do not exist, adding"
                 plugins = ElementTree.Element('%splugins' % POM_NS)
                 for i in root.iter('%sbuild' % POM_NS):

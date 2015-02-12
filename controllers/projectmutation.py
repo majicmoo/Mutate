@@ -4,7 +4,7 @@ import glob
 import os
 import ast
 
-CLONED_REPOS_PATH = os.path.join("applications", "Mutate" ,"models" , "testinggithubapi" ,"clonedrepos")
+CLONED_REPOS_PATH = os.path.join("applications", "Mutate" ,"models" , "mutate_projects" ,"cloned_repos")
 
 
 @auth.requires_login(otherwise=URL('default','login.html'))
@@ -60,7 +60,7 @@ def results():
     return dict(results=results, temp=temp, output=output, task_status = task.status)
 
 def get_project(task_id, current_number_of_projects_downloaded):
-    f = open(CLONED_REPOS_PATH+os.sep+str(task_id)+os.sep+'projectdescriptors.txt', "r")
+    f = open(CLONED_REPOS_PATH+os.sep+str(task_id)+os.sep+'project_descriptors.txt', "r")
     f_list = f.readlines()
     f.close()
     start_line = (int(current_number_of_projects_downloaded)-1)*6

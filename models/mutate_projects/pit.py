@@ -1,5 +1,5 @@
 __author__ = 'Megan'
-from applications.Mutate.models.testinggithubapi.mavenXMLConverter import ConvertXML
+from applications.Mutate.models.mutate_projects.mavenXMLConverter import ConvertXML
 import os
 import subprocess
 
@@ -30,10 +30,9 @@ class Pit(object):
         test = test[:-1]+'*'
         return test
 
-    def run(self, current_file, pom):
+    def run(self, pom):
         target_program = self.find_mutation_targets(str(pom))
-        xml_converter = ConvertXML()
-        xml_converter.convert_pom(target_program, target_program, pom)
+        ConvertXML.convert_pom(target_program, target_program, pom)
         print "DEBUG: running pit"
         try:
             print os.getcwd()

@@ -1,5 +1,6 @@
 import subprocess
 import shutil
+import os
 
 
 def onerror(func, path, exc_info):

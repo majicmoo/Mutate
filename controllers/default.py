@@ -1,7 +1,7 @@
-import applications.Mutate.models.testinggithubapi.authenticate as authenticate
+import applications.Mutate.models.mutate_projects.authenticate as authenticate
 import os
 
-CLONED_REPOS_PATH = "applications/Mutate/models/testinggithubapi/clonedrepos"
+CLONED_REPOS_PATH = "applications/Mutate/models/mutate_projects/cloned_repos"
 
 
 def index():

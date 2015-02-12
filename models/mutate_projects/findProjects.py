@@ -8,7 +8,7 @@ MAX_ITEMS = 30  # max number of items on each page in github
 SLEEP_TIME = 60  # Time between API accesses when reached rate limit
 ACCEPTED_STATUS_CODE = 200  # Status code of successful access to API
 NUMBER_OF_MAVEN_FILES = 1  # How many maven files you wish to find
-CLONED_REPOS_PATH = os.path.join("applications", "Mutate" ,"models" , "testinggithubapi" ,"clonedrepos")
+CLONED_REPOS_PATH = os.path.join("applications", "Mutate", "models", "mutate_projects", "cloned_repos")
 MAX_JUNIT_TESTS = 40
 MIN_JUNIT_TESTS = 0
 
@@ -16,12 +16,12 @@ MIN_JUNIT_TESTS = 0
 from gluon import current
 db = current.globalenv['db']
 
-from applications.Mutate.models.testinggithubapi.runMutationTools import RunMutationTools
-from applications.Mutate.models.testinggithubapi.project import Project
-from applications.Mutate.models.testinggithubapi.githubFunctions import GithubFunctions
-from applications.Mutate.models.testinggithubapi.cloneProject import CloneProject
-from applications.Mutate.models.testinggithubapi.runMaven import RunMaven
-from applications.Mutate.models.testinggithubapi.pit import Pit
+from applications.Mutate.models.mutate_projects.runMutationTools import RunMutationTools
+from applications.Mutate.models.mutate_projects.project import Project
+from applications.Mutate.models.mutate_projects.githubFunctions import GithubFunctions
+from applications.Mutate.models.mutate_projects.cloneProject import CloneProject
+from applications.Mutate.models.mutate_projects.runMaven import RunMaven
+from applications.Mutate.models.mutate_projects.pit import Pit
 
 
 class FindProjects(object):
@@ -32,8 +32,8 @@ class FindProjects(object):
         self.project_storage = []
         self.get_project = False
 
-    def search_for_projects(self, keyword, maxsize, minsize, language, sortby,
-                      orderby, number_of_projects, username, token, task, source_forge, mutation_tool):
+    def search_for_projects(self, keyword, maxsize, minsize, language, sortby, orderby, number_of_projects, username,
+                            token, task, source_forge, mutation_tool):
 
         if language not in self.languages:
             print "DEBUG:", language, "is not supported."
@@ -41,8 +41,8 @@ class FindProjects(object):
 
         # Initialise search depending on repository
         if source_forge == "Github":
-                search = GithubFunctions(keyword, maxsize, minsize, language, sortby, orderby, username, token, task)
-                search_result = search.initial_search_github()
+            search = GithubFunctions(keyword, maxsize, minsize, language, sortby, orderby, username, token, task)
+            search_result = search.initial_search()
         else:
             print "DEBUG:", source_forge, "is not supported"
             return False
@@ -52,6 +52,8 @@ class FindProjects(object):
         cloned_path = CLONED_REPOS_PATH + os.sep + str(task)
 
         while len(self.project_storage) < number_of_projects:
+            tool_ran_successfully = False
+            # Check current project has required files
             if language == "java":
                 # check for junit tests
                 if source_forge == "Github":
@@ -61,22 +63,44 @@ class FindProjects(object):
                         if search_for_junit < MAX_JUNIT_TESTS and search_for_junit > MIN_JUNIT_TESTS:
                             self.get_project = True
 
+            # If project has required fields
             if self.get_project:
+                # Put project in project format
                 current_project = Project(search.get_current_project())
-
                 if source_forge == "Github":
+                    # clone project
                     cloned_project_path = CloneProject(cloned_path, current_project).clone_repo()
                 else:
                     print "DEBUG:", source_forge, "is not supported"
                     return False
 
                 if language == "java":
+                    # run maven
                     run_maven = RunMaven(current_project).run_maven(cloned_project_path)
                     if run_maven:
-                        # Tests passed
                         if mutation_tool == "pit":
-                            pit = Pit().run(cloned_project_path, RunMaven(current_project).find_pom(cloned_project_path))
-                            if pit:
+                            # run pit
+                            tool_ran_successfully = Pit().run(RunMaven(current_project).find_pom(cloned_project_path))
+                else:
+                    print "DEBUG:", language, "is not supported"
+
+                # if tool ran succesfully add project to storage and write to file
+                if tool_ran_successfully:
+                    self.project_storage.append(current_project)
+                    print "Appending", current_project.name, "to project descriptors file"
+                    with open(CLONED_REPOS_PATH + os.sep + str(task) + os.sep + 'projectdescriptors.txt', "a") as myfile:
+                        myfile.write(str(current_project.name) + '\n' +
+                                     str(current_project.clone[:-4]) + '\n' +
+                                     str(current_project.language) + '\n' +
+                                     str(current_project.url) + '\n' +
+                                     str(current_project.size) + '\n' +
+                                     str(current_project.pom_location) + '\n')
+
+            if source_forge == "Github":
+                search_result = search.get_next_search_result()
+
+
+
                                     
 
 

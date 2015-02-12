@@ -3,10 +3,10 @@ import subprocess
 import shutil
 import stat  # needed for file stat
 import sys
-from applications.Mutate.models.testinggithubapi.mavenXMLConverter import ConvertXML
-from applications.Mutate.models.testinggithubapi.pit import Pit
+from applications.Mutate.models.mutate_projects.mavenXMLConverter import ConvertXML
+from applications.Mutate.models.mutate_projects.pit import Pit
 
-# from applications.Mutate.models.testinggithubapi.project import Project
+# from applications.Mutate.models.mutate_projects.project import Project
 
 
 def onerror(func, path, exc_info):

@@ -1,4 +1,4 @@
-import applications.Mutate.models.testinggithubapi.findProjects as findProjects
+import applications.Mutate.models.mutate_projects.findProjects as findProjects
 
 
 def find_projects_task(keyword, maxsize, minsize, language, sortby,
