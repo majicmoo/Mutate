@@ -19,6 +19,9 @@ db = current.globalenv['db']
 from applications.Mutate.models.testinggithubapi.runMutationTools import RunMutationTools
 from applications.Mutate.models.testinggithubapi.project import Project
 from applications.Mutate.models.testinggithubapi.githubFunctions import GithubFunctions
+from applications.Mutate.models.testinggithubapi.cloneProject import CloneProject
+from applications.Mutate.models.testinggithubapi.runMaven import RunMaven
+from applications.Mutate.models.testinggithubapi.pit import Pit
 
 
 class FindProjects(object):
@@ -26,28 +29,55 @@ class FindProjects(object):
     def __init__(self):
         # languages accepted
         self.languages = ["python", "java", "ruby", "c"]
-        self.count_github_access = 0
+        self.project_storage = []
+        self.get_project = False
 
     def search_for_projects(self, keyword, maxsize, minsize, language, sortby,
                       orderby, number_of_projects, username, token, task, source_forge, mutation_tool):
 
+        if language not in self.languages:
+            print "DEBUG:", language, "is not supported."
+            return False
+
+        # Initialise search depending on repository
         if source_forge == "Github":
-            GithubFunctions().search_github(self, keyword, maxsize, minsize, language, sortby,
-                      orderby, number_of_projects, username, token, mutation_tool)
-
-
-
-
-
+                search = GithubFunctions(keyword, maxsize, minsize, language, sortby, orderby, username, token, task)
+                search_result = search.initial_search_github()
         else:
-            print "DEBUG:", source_forge, "is not supported."
+            print "DEBUG:", source_forge, "is not supported"
+            return False
 
+        # create directory for current user search
+        os.makedirs(CLONED_REPOS_PATH + os.sep + str(task))
+        cloned_path = CLONED_REPOS_PATH + os.sep + str(task)
 
+        while len(self.project_storage) < number_of_projects:
+            if language == "java":
+                # check for junit tests
+                if source_forge == "Github":
+                    search_for_mvn = search.search_for_mvn(search_result)["total_count"]
+                    if search_for_mvn == NUMBER_OF_MAVEN_FILES:
+                        search_for_junit = search.search_repo_for_junit_tests(search_result)["total_count"]
+                        if search_for_junit < MAX_JUNIT_TESTS and search_for_junit > MIN_JUNIT_TESTS:
+                            self.get_project = True
 
+            if self.get_project:
+                current_project = Project(search.get_current_project())
 
+                if source_forge == "Github":
+                    cloned_project_path = CloneProject(cloned_path, current_project).clone_repo()
+                else:
+                    print "DEBUG:", source_forge, "is not supported"
+                    return False
 
-
-
+                if language == "java":
+                    run_maven = RunMaven(current_project).run_maven(cloned_project_path)
+                    if run_maven:
+                        # Tests passed
+                        if mutation_tool == "pit":
+                            pit = Pit().run(cloned_project_path, RunMaven(current_project).find_pom(cloned_project_path))
+                            if pit:
+                                    
 
 
 

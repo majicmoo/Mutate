@@ -18,13 +18,46 @@ MIN_JUNIT_TESTS = 0
 
 class GithubFunctions(object):
 
-    def __init__(self):
-        # languages accepted
-        self.languages = ["python", "java", "ruby", "c"]
+    def __init__(self, keyword, maxsize, minsize, language, sortby,
+                      orderby, username, token, task):
         self.count_github_access = 0
+        self.keyword = keyword
+        self.maxsize = maxsize
+        self.minsize = minsize
+        self.language = language
+        self.sortby = sortby
+        self.orderby = orderby
+        self.username = username
+        self.token = token
+        self.task = task
+        self.pagination = 2
+        self.search_counter = 0
+        self.search_string = ""
+        self.search_dictionary = None
 
-    def search_github(self, keyword, maxsize, minsize, language, sortby,
-                      orderby, number_of_projects, username, token, task, mutation_tool):
+
+    def initial_search_github(self):
+        # create search url
+        self.search_string = self.create_general_search_url()
+        self.search_dictionary = self.request_github(self.search_string)
+        return self.search_dictionary["items"][self.search_counter]["full_name"]
+
+
+    def get_next_search_result(self):
+        self.search_counter += 1
+        if self.search_counter >= MAX_ITEMS:
+            self.search_dictionary = self.request_github(self.search_string+'&page='+str(self.pagination))
+            self.pagination += 1
+            self.search_counter = 0
+        return self.search_dictionary["items"][self.search_counter]["full_name"]
+
+    def get_current_project(self):
+        return self.search_dictionary["items"][self.search_counter]
+
+
+
+
+    def search_github(self):
         # keyword: search keyword
         # maxsize: maximum size of repository
         # minsize: minimum size of repository
@@ -32,14 +65,7 @@ class GithubFunctions(object):
         # sortby: what you want to sort repos by (stars /forks / updated)
         # orderby: order sort by ascending or descending (asc/desc)
 
-        if language not in self.languages:
-            # Check language is valid
-            print "DEBUG: language", language, "is not valid"
-            return False
 
-        # create directory for current user search
-        os.makedirs(CLONED_REPOS_PATH + os.sep + str(task))
-        cloned_path = CLONED_REPOS_PATH + os.sep + str(task)
 
         # create search url
         search_string = self.create_general_search_url(keyword, language, sortby, orderby, minsize, maxsize)
@@ -50,22 +76,21 @@ class GithubFunctions(object):
         pagination = 2
         repository_storage = []
         search_counter = 0
-        while len(repository_storage) < number_of_projects:
+        while len(repository_storage) < self.number_of_projects:
             print search_counter
             if search_counter >= MAX_ITEMS:
-                search_dictionary = self.request_github(search_string+'&page='+str(pagination), username, token)
+                search_dictionary = self.request_github(search_string+'&page='+str(pagination))
                 pagination += 1
 
             repo_name = search_dictionary["items"][search_counter]["full_name"]
             #If pit and java
-            if language == "java":
+            if self.language == "java":
                 #Java is language
-                if mutation_tool == "pit":
+                if self.mutation_tool == "pit":
                     # Pit is mutation tool
-                    search_for_mvn = self.search_for_mvn(repo_name, username, token)["total_count"]
+                    search_for_mvn = self.search_for_mvn(repo_name)["total_count"]
                     if search_for_mvn == NUMBER_OF_MAVEN_FILES:
-                        search_for_junit = self.search_repo_for_junit_tests(repo_name, "java", username,
-                                                                            token)["total_count"]
+                        search_for_junit = self.search_repo_for_junit_tests(repo_name)["total_count"]
                         if search_for_junit < MAX_JUNIT_TESTS and search_for_junit > MIN_JUNIT_TESTS:
                             temp_project = Project(search_dictionary["items"][search_counter])
                             print "*******************************************"
@@ -74,7 +99,7 @@ class GithubFunctions(object):
                                 repository_storage.append(temp_project)
                                 # Add repository to database
                                 print "Appending", temp_project.name, "to project descriptors file"
-                                with open(CLONED_REPOS_PATH + os.sep + str(task) + os.sep + 'projectdescriptors.txt', "a") as myfile:
+                                with open(CLONED_REPOS_PATH + os.sep + str(self.task) + os.sep + 'projectdescriptors.txt', "a") as myfile:
                                     myfile.write(str(temp_project.name) + '\n' +
                                                  str(temp_project.clone[:-4]) + '\n' +
                                                  str(temp_project.language) + '\n' +
@@ -85,29 +110,29 @@ class GithubFunctions(object):
                     # print "PAGE NUMBER:", pagination
                     # print "ENDED ON:", search_string+'&page='+str(pagination)
                 else:
-                    print "DEBUG", mutation_tool, "is not currently supported."
+                    print "DEBUG", self.mutation_tool, "is not currently supported."
             else:
-                print "DEBUG", language, "is not currently supported."
+                print "DEBUG", self.language, "is not currently supported."
         return repository_storage
 
-    def search_repo_for_junit_tests(self, repo, language, username, token):
+    def search_repo_for_junit_tests(self, repo):
         # search repository (given by repo) for junit tests
         search_string = self.create_search_in_file_type_in_repo_url(language, repo, "junit")
-        return self.request_github(search_string, username, token)
+        return self.request_github(search_string)
 
-    def search_for_mvn(self, repo, username, token):
+    def search_for_mvn(self, repo):
         # search repo for pom.xml file
         search_string = self.create_file_in_project_search_url('xml+pom', repo)
-        return self.request_github(search_string, username, token)
+        return self.request_github(search_string)
 
-    def create_general_search_url(self, keyword, language, sortby, orderby, minsize, maxsize):
+    def create_general_search_url(self):
         # Search github using keyword and language
         start = GITHUB_API + '/search/repositories?'
-        search_keyword = "q=" + keyword
-        search_language = 'language:' + language
-        sort = "sort=" + sortby
-        order = "order=" + orderby
-        size = "size:" + str(minsize) + ".." + str(maxsize)
+        search_keyword = "q=" + self.keyword
+        search_language = 'language:' + self.language
+        sort = "sort=" + self.sortby
+        order = "order=" + self.orderby
+        size = "size:" + str(self.minsize) + ".." + str(self.maxsize)
         # Search for projects
         return start + search_keyword + "+" + size + "+" + search_language + "&" + sort + "&" + order
 
@@ -130,10 +155,10 @@ class GithubFunctions(object):
         print "DEBUG sleep:", SLEEP_TIME, "seconds"
         time.sleep(SLEEP_TIME)
 
-    def request_github(self, search_string, username, token):
+    def request_github(self, search_string):
         while True:
             print 'DEBUG: requesting', search_string
-            github_request = requests.get(search_string, auth=(username+"/token", token))
+            github_request = requests.get(search_string, auth=(self.username+"/token", self.token))
             if github_request.status_code == ACCEPTED_STATUS_CODE:
                 return github_request.json()
             else:
