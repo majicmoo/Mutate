@@ -1,7 +1,7 @@
 import applications.Mutate.models.mutate_projects.authenticate as authenticate
 import os
 
-CLONED_REPOS_PATH = "applications/Mutate/models/mutate_projects/cloned_repos"
+CLONED_REPOS_PATH = os.path.join("applications", "Mutate", "models", "mutate_projects", "cloned_repos")
 
 
 def index():
@@ -70,7 +70,8 @@ def mutateprojects():
                                                         minsize=int(request.vars.min_repo_size),
                                                         language=request.vars.language.lower(), sortby=order_by,
                                                         orderby=asc_desc, number_of_projects=int(request.vars.no_results),
-                                                        username=username, token=session.token) ,timeout=560)
+                                                        username=username, token=session.token, source_forge="Github",
+                                                        mutation_tool="pit") ,timeout=560)
         print 'task', task.id, 'started'
 
 

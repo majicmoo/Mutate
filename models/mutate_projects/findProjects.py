@@ -18,7 +18,7 @@ db = current.globalenv['db']
 
 from applications.Mutate.models.mutate_projects.runMutationTools import RunMutationTools
 from applications.Mutate.models.mutate_projects.project import Project
-from applications.Mutate.models.mutate_projects.githubFunctions import GithubFunctions
+from applications.Mutate.models.mutate_projects.github import Github
 from applications.Mutate.models.mutate_projects.cloneProject import CloneProject
 from applications.Mutate.models.mutate_projects.runMaven import RunMaven
 from applications.Mutate.models.mutate_projects.pit import Pit
@@ -41,7 +41,7 @@ class FindProjects(object):
 
         # Initialise search depending on repository
         if source_forge == "Github":
-            search = GithubFunctions(keyword, maxsize, minsize, language, sortby, orderby, username, token, task)
+            search = Github(keyword, maxsize, minsize, language, sortby, orderby, username, token, task)
             search_result = search.initial_search()
         else:
             print "DEBUG:", source_forge, "is not supported"

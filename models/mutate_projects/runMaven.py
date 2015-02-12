@@ -32,7 +32,7 @@ class RunMaven(object):
         pom = self.find_pom(current_file)
         print "DEBUG: Running tests for ", current_file
         print "mvn -f " + str(pom) + " test"
-        # checkoutput if mvn tests fail delete folder
+        # check output if mvn tests fail delete folder
         try:
             temp = subprocess.check_output("mvn -f " + pom + " test", shell=True)
             temp = temp.split("\n")
