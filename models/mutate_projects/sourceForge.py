@@ -1,6 +1,6 @@
 class SourceForge(object):
 
-    def __init__(self, keyword, maxsize, minsize, language, sort_by, order_by, username, token, task):
+    def __init__(self, keyword, maxsize, minsize, language, sort_by, order_by, username, token, task, cloned_repo_path):
         self.keyword = keyword
         self.maxsize = maxsize
         self.minsize = minsize
@@ -10,6 +10,7 @@ class SourceForge(object):
         self.username = username
         self.token = token
         self.task = task
+        self.clone_repo_path = cloned_repo_path
 
     def initial_search(self):
         pass

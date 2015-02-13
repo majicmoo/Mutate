@@ -30,21 +30,24 @@ class RunMaven(object):
 
     def run_maven(self, current_file):
         pom = self.find_pom(current_file)
+        print pom
         print "DEBUG: Running tests for ", current_file
         print "mvn -f " + str(pom) + " test"
         # check output if mvn tests fail delete folder
+
         try:
-            temp = subprocess.check_output("mvn -f " + pom + " test", shell=True)
-            temp = temp.split("\n")
+            maven_output = subprocess.check_output("mvn -f " + pom + " test", shell=True)
+            print maven_output
+            maven_output = maven_output.split("\n")
             num = '1234567890'
             tests_run, failures, errors, skipped = 0, 0, 0, 0
-            for i in temp:
-                if "Tests run:" in i:
-                    i = i.split(",")
-                    tests_run, failures, errors, skipped = int("".join([c for c in i[0] if c in num])),\
-                                                           int("".join([c for c in i[1] if c in num])),\
-                                                           int("".join([c for c in i[2] if c in num])),\
-                                                           int("".join([c for c in i[3] if c in num]))
+            for line in maven_output:
+                if "Tests run:" in line:
+                    line = line.split(",")
+                    tests_run, failures, errors, skipped = int("".join([c for c in line[0] if c in num])),\
+                                                           int("".join([c for c in line[1] if c in num])),\
+                                                           int("".join([c for c in line[2] if c in num])),\
+                                                           int("".join([c for c in line[3] if c in num]))
             print "Tests run:", tests_run, "\n", "Failures:", failures, "\n", "Errors:", errors, "\n", \
                 "Skipped:", skipped
 

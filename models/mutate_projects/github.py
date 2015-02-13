@@ -18,14 +18,13 @@ MIN_JUNIT_TESTS = 0
 
 class Github(SourceForge):
 
-    def __init__(self, keyword, maxsize, minsize, language, sort_by, order_by, username, token, task):
-        super(Github, self).__init__(keyword, maxsize, minsize, language, sort_by, order_by, username, token, task)
+    def __init__(self, *args, **kwargs):
+        super(Github, self).__init__(*args, **kwargs)
         self.count_github_access = 0
         self.pagination = 2
         self.search_counter = 0
         self.search_string = ""
         self.search_dictionary = None
-        self.cloned_repos_path = os.path.join("applications", "Mutate" ,"models" , "mutate_projects" ,"cloned_repos", str(self.task))
 
     def initial_search(self):
         # create search url
@@ -47,15 +46,15 @@ class Github(SourceForge):
     def clone_repo(self, project):
         # create folder to clone into
         max_file_number = 0
-        print "Current Path:",self.cloned_repos_path
-        for files in os.walk(self.cloned_repos_path):
+        print "Current Path:",self.clone_repo_path
+        for files in os.walk(self.clone_repo_path):
             temp = map(int, files[1])
             print temp
             if len(temp) > 0:
                 max_file_number = max(temp)
             break
         print "Max file number:", max_file_number
-        new_directory = os.path.join(self.cloned_repos_path,str(max_file_number+1))
+        new_directory = os.path.join(self.clone_repo_path,str(max_file_number+1))
 
         print "DEBUG: Make directory: " + new_directory
         os.makedirs(new_directory)
