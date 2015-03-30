@@ -16,8 +16,6 @@ def find_projects_task(keyword, maxsize, minsize, language, sortby,
     run = Main()
     run.main(keyword, maxsize, minsize, language, sortby,
                       orderby, number_of_projects, username, token, task_id, source_forge, mutation_tool)
-
-
     return dict(result="done")
 
 from gluon.scheduler import Scheduler

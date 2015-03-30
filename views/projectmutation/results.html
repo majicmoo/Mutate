@@ -1,6 +1,7 @@
 {{extend 'layout.html'}}
-
-
+{{for i in list_of_projects:}}
+    <script type="text/html" src="{{=URL('static','index/'+str(task_id)+'/'+str(i)+'/index.html')}}"></script>
+{{pass}}
 
 <div id="result">
     {{if task_status == "FAILED":}}

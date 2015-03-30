@@ -1,18 +1,17 @@
-import applications.Mutate.models.mutate_projects.authenticate as authenticate
 import os
 
 CLONED_REPOS_PATH = os.path.join("applications", "Mutate", "models", "mutate_projects", "cloned_repos")
 
 
 def index():
+    temp = os.getcwd()
+    return dict(temp=temp)
 
-    return dict(dict=dict)
 
 def mutateprojects():
 
     # Subject Selection
-    form=FORM(DIV(FIELDSET(
-    LEGEND('Search For Repositories'),
+    form = FORM(DIV(FIELDSET(LEGEND('Search For Repositories'),
     # Keyword
       DIV(LABEL('Keyword', _for='keyword', _class='control-label'),
       DIV(INPUT(_name='keyword'), _class='controls'),  _class='control-group'),
@@ -71,15 +70,13 @@ def mutateprojects():
                                                         language=request.vars.language.lower(), sortby=order_by,
                                                         orderby=asc_desc, number_of_projects=int(request.vars.no_results),
                                                         username=username, token=session.token, source_forge="Github",
-                                                        mutation_tool="pit") ,timeout=560)
+                                                        mutation_tool="pit"), timeout=300, repeats=1)
         print 'task', task.id, 'started'
-
-
-
         session.search.append(task)
         redirect(URL('projectmutation','results',args=[str(task.id)]))
 
     return dict(form=form)
+
 
 def register():
      form=FORM(DIV(FIELDSET(
@@ -118,7 +115,7 @@ def login():
 
     if form.accepts(request, session):
         session.token = request.vars.token
-        session.search=[]
+        session.search = []
         user=db(db.auth_user.username==request.vars.username).select().first()
         if user is None:
             session.flash = H1('Please Register')

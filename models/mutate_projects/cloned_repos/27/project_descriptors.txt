@@ -1,6 +1,0 @@
-jsoup
-https://github.com/jhy/jsoup
-Java
-https://api.github.com/repos/jhy/jsoup
-5122
-applications/Mutate/models/mutate_projects/cloned_repos/27/1/pom.xml

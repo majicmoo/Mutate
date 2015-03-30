@@ -1,26 +1,6 @@
 import subprocess
-import shutil
 import os
-
-
-def onerror(func, path, exc_info):
-    """
-    Error handler for ``shutil.rmtree``.
-
-    If the error is due to an access error (read only file)
-    it attempts to add write permission and then retries.
-
-    If the error is for another reason it re-raises the error.
-
-    Usage : ``shutil.rmtree(path, onerror=onerror)``
-    """
-    import stat
-    if not os.access(path, os.W_OK):
-        # Is the error an access error ?
-        os.chmod(path, stat.S_IWUSR)
-        func(path)
-    else:
-        raise
+from applications.Mutate.models.mutate_projects.functions import Functions
 
 
 class RunMaven(object):
@@ -30,11 +10,12 @@ class RunMaven(object):
 
     def run_maven(self, current_file):
         pom = self.find_pom(current_file)
-        print pom
+        if pom is None:
+            print "DEBUG: Pom.xml not found."
+            return False
         print "DEBUG: Running tests for ", current_file
         print "mvn -f " + str(pom) + " test"
         # check output if mvn tests fail delete folder
-
         try:
             maven_output = subprocess.check_output("mvn -f " + pom + " test", shell=True)
             print maven_output
@@ -48,22 +29,24 @@ class RunMaven(object):
                                                            int("".join([c for c in line[1] if c in num])),\
                                                            int("".join([c for c in line[2] if c in num])),\
                                                            int("".join([c for c in line[3] if c in num]))
-            print "Tests run:", tests_run, "\n", "Failures:", failures, "\n", "Errors:", errors, "\n", \
+            print "Tests run:", tests_run, "\n", "Failures:", failures, "\n", "Errors:", errors, "\n",\
                 "Skipped:", skipped
 
             if tests_run == 0:
                 print "DEBUG: No tests run"
-                self.delete_repo(current_file)
+                Functions().delete_repo(current_file)
+                return False
 
             if failures > 0:
                 print "DEBUG: Test suite not green"
-                self.delete_repo(current_file)
+                Functions().delete_repo(current_file)
+                return False
 
             print "DEBUG: Test Successful"
             return True
         except subprocess.CalledProcessError:
             print "DEBUG: Test Failed"
-            self.delete_repo(current_file)
+            Functions().delete_repo(current_file)
             return False
 
     def find_pom(self, current_file):
@@ -71,9 +54,6 @@ class RunMaven(object):
         for root, dirnames, files in os.walk(current_file):
             for i in files:
                 if i == 'pom.xml':
-                    self.project.pom_location = root+os.sep+i
-                    return root+os.sep+i
+                    self.project.pom_location = os.path.join(root,i)
+                    return self.project.pom_location
 
-    def delete_repo(self, current_file):
-        print "DEBUG: Deleting", current_file
-        shutil.rmtree(current_file, onerror=onerror)

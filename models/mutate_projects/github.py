@@ -3,6 +3,7 @@ import os
 import requests
 import time
 import subprocess
+from requests.exceptions import ConnectionError
 from applications.Mutate.models.mutate_projects.project import Project
 from applications.Mutate.models.mutate_projects.sourceForge import SourceForge
 
@@ -71,7 +72,9 @@ class Github(SourceForge):
 
     def search_for_mvn(self, repo):
         # search repo for pom.xml file
-        search_string = self.create_file_in_project_search_url('xml+pom', repo)
+        filename = "pom"
+        extension = "xml"
+        search_string = self.create_file_in_project_search_url(filename, extension, repo)
         return self.request_github(search_string)
 
     def create_general_search_url(self):
@@ -85,12 +88,15 @@ class Github(SourceForge):
         # Search for projects
         return start + search_keyword + "+" + size + "+" + search_language + "&" + sort + "&" + order
 
-    def create_file_in_project_search_url(self, filename, repo):
+    def create_file_in_project_search_url(self, filename, extension, repo):
         # Create URL to search for a file in a project
-        start = "https://api.github.com/search/code?q=project+"
-        filename = "filename:."+filename
+        start = "https://api.github.com/search/code?q="
+        filename = "filename:"+str(filename)
+        extension = "+extension:"+ extension
         repo_search = "+repo:"+repo
-        return start + filename + repo_search
+        url = start + filename + repo_search + extension
+        print url
+        return url
 
     def create_search_in_file_type_in_repo_url(self, repo, keyword):
         # Create URL to search for a keyword in a file type in a repo, eg. junit in java files
@@ -106,10 +112,15 @@ class Github(SourceForge):
 
     def request_github(self, search_string):
         while True:
-            print 'DEBUG: requesting', search_string
-            github_request = requests.get(search_string, auth=(self.username+"/token", self.token))
-            if github_request.status_code == ACCEPTED_STATUS_CODE:
-                return github_request.json()
+            while True:
+                try:
+                    print 'DEBUG: requesting', search_string
+                    github_request = requests.get(search_string, auth=(self.username+"/token", self.token))
+                    if github_request.status_code == ACCEPTED_STATUS_CODE:
+                        return github_request.json()
+                except ConnectionError:
+                    print 'DEBUG: Github slow to respond'
+                    continue
             else:
                 self.sleep_search()
                 continue

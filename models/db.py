@@ -16,7 +16,7 @@ if not request.env.web2py_runtime_gae:
     db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['all'])
     db.define_table('project', Field('clone_url'), Field('name'),Field('programming_language'), Field('url'),
                     Field('repo_size'),Field('pom_location'), Field('current_username'), Field('author'),
-                    Field('task_number'))
+                    Field('task_number'), Field('mutation_score'))
 
 else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
