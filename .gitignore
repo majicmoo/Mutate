@@ -32,3 +32,4 @@ pip-log.txt
 # Local
 local_resources
 **/mutate_projects/cloned_repos
+**/static/index
