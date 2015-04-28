@@ -1,0 +1,17 @@
+{{extend 'layout.html'}}
+<script type="text/html" src="{{=URL('static','index/'+str(task_id)+'/'+str(i)+'/index.html')}}"></script>
+
+<div id="result">
+    {{if task_status == "FAILED":}}
+        <h1>Search Failed</h1>
+    {{else:}}
+        <script type="text/javascript" src="{{=URL('static','js/polling.js')}}"></script>
+        <script>timedRefresh(5000)</script>
+        <hr>
+        {{for i in output:}}
+            {{=i}}
+        {{pass}}
+    {{pass}}
+</div>
+
+

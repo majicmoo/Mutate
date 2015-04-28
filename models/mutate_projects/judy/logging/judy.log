@@ -1,0 +1,53 @@
+2015-04-20 14:13:25,408  INFO   Judy, Mon Apr 20 14:13:25 BST 2015 
+2015-04-20 14:13:25,408  INFO   Parsing input... 
+2015-04-20 14:13:25,433  ERROR  Configuration error: No source classes found! 
+2015-04-20 14:14:28,201  INFO   Judy, Mon Apr 20 14:14:28 BST 2015 
+2015-04-20 14:14:28,201  INFO   Parsing input... 
+2015-04-20 14:14:28,227  ERROR  Configuration error: No source classes found! 
+2015-04-20 14:15:53,823  INFO   Judy, Mon Apr 20 14:15:53 BST 2015 
+2015-04-20 14:15:53,823  INFO   Parsing input... 
+2015-04-20 14:15:53,853  ERROR  Configuration error: No source classes found! 
+2015-04-20 14:17:55,116  INFO   Judy, Mon Apr 20 14:17:55 BST 2015 
+2015-04-20 14:17:55,117  INFO   Parsing input... 
+2015-04-20 14:17:55,141  ERROR  Configuration error: No source classes found! 
+2015-04-20 14:19:56,415  INFO   Judy, Mon Apr 20 14:19:56 BST 2015 
+2015-04-20 14:19:56,416  INFO   Parsing input... 
+2015-04-20 14:19:56,443  ERROR  Configuration error: No source classes found! 
+2015-04-20 14:24:49,127  INFO   Judy, Mon Apr 20 14:24:49 BST 2015 
+2015-04-20 14:24:49,128  INFO   Parsing input... 
+2015-04-20 14:24:49,322  INFO   Class deemed as unmutable, removing: websocket.OnCloseHandler 
+2015-04-20 14:24:49,323  INFO   Class deemed as unmutable, removing: websocket.OnDataHandler 
+2015-04-20 14:24:49,324  INFO   Class deemed as unmutable, removing: websocket.OnErrorHandler 
+2015-04-20 14:24:49,325  INFO   Class deemed as unmutable, removing: websocket.OnHandshakeSuccessHandler 
+2015-04-20 14:24:49,325  INFO   Class deemed as unmutable, removing: websocket.OnKickHandler 
+2015-04-20 14:24:49,335  INFO   No judy.operators property found, will add all... 
+2015-04-20 14:24:49,379  INFO   Parsing input... Done 
+2015-04-20 14:24:49,380  INFO   Initial analysis... 
+2015-04-20 14:24:49,388  INFO   Initial analysis... Done 
+2015-04-20 14:24:49,401  INFO   Computing mutation result... 
+2015-04-20 14:24:49,446  INFO   Progress  ClassKind  Class                        Killed     All  Test classes  Test methods  Tests duration [ms] 
+2015-04-20 14:24:49,446  WARN   All initial tests failed! Nothing to mutate. 
+2015-04-20 14:24:49,447  INFO   Computing mutation result... Done 
+2015-04-20 14:24:49,449  INFO    
+2015-04-20 14:24:49,449  INFO    
+2015-04-20 14:24:49,449  INFO   Saving result...  
+2015-04-20 14:24:49,765  INFO   Saving result... Done  
+2015-04-20 14:31:49,695  INFO   Judy, Mon Apr 20 14:31:49 BST 2015 
+2015-04-20 14:31:49,696  INFO   Parsing input... 
+2015-04-20 14:31:49,749  INFO   Class deemed as unmutable, removing: websocket.OnCloseHandler 
+2015-04-20 14:31:49,749  INFO   Class deemed as unmutable, removing: websocket.OnDataHandler 
+2015-04-20 14:31:49,750  INFO   Class deemed as unmutable, removing: websocket.OnErrorHandler 
+2015-04-20 14:31:49,750  INFO   Class deemed as unmutable, removing: websocket.OnHandshakeSuccessHandler 
+2015-04-20 14:31:49,751  INFO   Class deemed as unmutable, removing: websocket.OnKickHandler 
+2015-04-20 14:31:49,758  INFO   No judy.operators property found, will add all... 
+2015-04-20 14:31:49,779  INFO   Parsing input... Done 
+2015-04-20 14:31:49,779  INFO   Initial analysis... 
+2015-04-20 14:31:49,785  INFO   Initial analysis... Done 
+2015-04-20 14:31:49,803  INFO   Computing mutation result... 
+2015-04-20 14:31:49,809  INFO   Progress  ClassKind  Class                        Killed     All  Test classes  Test methods  Tests duration [ms] 
+2015-04-20 14:31:49,809  WARN   All initial tests failed! Nothing to mutate. 
+2015-04-20 14:31:49,810  INFO   Computing mutation result... Done 
+2015-04-20 14:31:49,812  INFO    
+2015-04-20 14:31:49,812  INFO    
+2015-04-20 14:31:49,812  INFO   Saving result...  
+2015-04-20 14:31:49,863  INFO   Saving result... Done  

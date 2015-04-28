@@ -7,6 +7,7 @@ import os
 import subprocess
 import shutil
 
+EXPERIMENT_RESULTS_FILE = "experiment_results.txt"
 
 NUMBER_OF_MAVEN_FILES = 1  # Number of pom.xml each project must have
 MAX_JUNIT_TESTS = 40  # maximum number of junit tests
@@ -27,13 +28,17 @@ class Pit(MutationTool):
             if MIN_JUNIT_TESTS < search_for_junit < MAX_JUNIT_TESTS:
                 return True
             else:
-                return False
+                return [True, False]
         else:
-            return False
+            search_for_junit = search.search_repo_for_junit_tests(search_result)["total_count"]
+            if MIN_JUNIT_TESTS < search_for_junit < MAX_JUNIT_TESTS:
+                return [False, True]
+            return [False, False]
 
     def run_setup(self, project_location):
         # Run anything required to setup tool
         run_maven = RunMaven(self.project).run_maven(project_location)
+
         if run_maven is False:
             return False
         else:
@@ -46,13 +51,17 @@ class Pit(MutationTool):
         pom = self.find_pom(current_file)
         print "DEBUG: running pit"
         try:
-            print "mvn org.pitest:pitest-maven:mutationCoverage -f " + pom
-            pit_test = subprocess.check_output("mvn org.pitest:pitest-maven:mutationCoverage -f " + pom + "--timeoutConst 10000000", shell=True)
+            command = "mvn org.pitest:pitest-maven:mutationCoverage -f " + pom
+            print command
+            pit_test = functions.Functions().run(600, command)
+            print pit_test
             pit_test = pit_test.split('\n')
             for i in pit_test:
                 if 'BUILD SUCCESS' in i:
                     print "DEBUG: Pit Passes"
                     mutation_score = self.find_mutation_score(self.find_pit_report_index(pom))
+                    with open(EXPERIMENT_RESULTS_FILE, 'a') as myfile:
+                        myfile.write("mutation score: " + str(mutation_score)+'\n')
                     return mutation_score
             print "DEBUG: Pit Failed"
             functions.Functions().delete_repo(current_file)
@@ -127,5 +136,7 @@ class Pit(MutationTool):
                     return root
 #
 # pit = Pit(Project({'clone_url': False, 'name': False, 'language': False, 'url': False, 'size': False}))
-# #print pit.find_mutation_targets(pit.find_pom(r'C:\Users\Megan\Documents\web2py_win\web2py\applications\Mutate\models\mutate_projects\cloned_repos\1\2'))
-# pit.find_mutation_score(pit.find_index(pit.find_pom(r'C:\Users\Megan\Documents\web2py_win\web2py\applications\Mutate\models\mutate_projects\cloned_repos\57\1')))
+# print pit.find_mutation_targets(pit.find_pom(r'C:\Users\Megan\Documents\web2py_win\web2py\applications\Mutate\models
+# \mutate_projects\cloned_repos\1\2'))
+# pit.find_mutation_score(pit.find_index(pit.find_pom(r'C:\Users\Megan\Documents\web2py_win\web2py\applications\Mutat
+# e\models\mutate_projects\cloned_repos\57\1')))

@@ -78,6 +78,47 @@ def mutateprojects():
     return dict(form=form)
 
 
+def mutate_project():
+    form = FORM(DIV(FIELDSET(LEGEND('Mutate A Project'),
+                # Keyword
+                    DIV(LABEL('Repository Name', _for='repo_name', _class='control-label'),
+                        DIV(INPUT(_name='repo_name', requires=IS_NOT_EMPTY())), _class='controls'),
+                _class='control-group'),
+                # Language
+                DIV(LABEL('Team Name', _for='team_name', _class='control-label'),
+                    DIV(INPUT(_name='team_name', requires=IS_NOT_EMPTY())), _class='controls'),
+                _class='control-group'),
+                # Code Forge
+                DIV(LABEL('Code-forge', _for='source_forge', _class='control-label'),
+                    DIV(SELECT(OPTION("Github"), OPTION("Bitbucket"), _name='source_forge'), _class='controls'),
+                    _class='control-group'),
+                # submit
+                DIV(DIV(DIV(BUTTON('Submit', _type='submit', _class="btn btn-large btn-primary")), _class="row"),
+                    _class="offset3 span3"), _class='form-horizontal')
+
+    if form.accepts(request, session):
+        # User has made search, submit task
+        if request.vars.min_value > request.vars.max_value:
+            session.flash = "Min should be lower than Max"
+            redirect(location=URL('default','mutateprojects.html'))
+        # Check if keyword is none
+        if request.vars.keyword is None:
+            keyword = ""
+        else:
+            keyword = request.vars.keyword
+        # Check Ascending v descending
+        print request.vars.source_forge, request.vars.team_name, request.vars.repo_name
+        task = scheduler.queue_task('mutateSingleProject', pvars=dict(source_forge=request.vars.source_forge,
+                                                                      mutation_tool="pit",
+                                                                      team_name=request.vars.team_name,
+                                                                      repo_name=request.vars.repo_name),
+                                    timeout=300, repeats=1)
+        print 'task', task.id, 'started'
+        #session.search.append(task)
+        redirect(URL('projectmutation', 'result', args=[str(task.id)]))
+
+    return dict(form=form)
+
 def register():
      form=FORM(DIV(FIELDSET(
          LEGEND('Register'),
@@ -97,6 +138,7 @@ def register():
          redirect(URL('default','login.html'))
 
      return dict(form=form)
+
 
 def login():
     # Github Auth

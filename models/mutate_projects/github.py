@@ -1,7 +1,6 @@
 __author__ = 'Megan'
 import os
 import requests
-import time
 import subprocess
 from requests.exceptions import ConnectionError
 from applications.Mutate.models.mutate_projects.project import Project
@@ -10,7 +9,6 @@ from applications.Mutate.models.mutate_projects.sourceForge import SourceForge
 
 GITHUB_API = 'https://api.github.com'
 MAX_ITEMS = 30  # max number of items on each page in github
-SLEEP_TIME = 60  # Time between API accesses when reached rate limit
 ACCEPTED_STATUS_CODE = 200  # Status code of successful access to API
 NUMBER_OF_MAVEN_FILES = 1  # How many maven files you wish to find
 MAX_JUNIT_TESTS = 40
@@ -47,7 +45,7 @@ class Github(SourceForge):
     def clone_repo(self, project):
         # create folder to clone into
         max_file_number = 0
-        print "Current Path:",self.clone_repo_path
+        print "Current Path:", self.clone_repo_path
         for files in os.walk(self.clone_repo_path):
             temp = map(int, files[1])
             print temp
@@ -55,7 +53,7 @@ class Github(SourceForge):
                 max_file_number = max(temp)
             break
         print "Max file number:", max_file_number
-        new_directory = os.path.join(self.clone_repo_path,str(max_file_number+1))
+        new_directory = os.path.join(self.clone_repo_path, str(max_file_number+1))
 
         print "DEBUG: Make directory: " + new_directory
         os.makedirs(new_directory)
@@ -64,6 +62,9 @@ class Github(SourceForge):
         subprocess.call("git clone "+project.clone+" "+new_directory,
                         shell=True)
         return new_directory
+
+    def get_single_project(self):
+        pass
 
     def search_repo_for_junit_tests(self, repo):
         # search repository (given by repo) for junit tests
@@ -76,6 +77,15 @@ class Github(SourceForge):
         extension = "xml"
         search_string = self.create_file_in_project_search_url(filename, extension, repo)
         return self.request_github(search_string)
+
+    def search_for_ant(self, repo):
+        # search repo for pom.xml file
+        filename = "build"
+        extension = "xml"
+        search_string = self.create_file_in_project_search_url(filename, extension, repo)
+        return self.request_github(search_string)
+
+
 
     def create_general_search_url(self):
         # Search github using keyword and language
@@ -105,10 +115,6 @@ class Github(SourceForge):
         language_search = "language:"+self.language
         repo_search = "+repo:"+repo
         return start + keyword + "+in:file+" + language_search + repo_search
-
-    def sleep_search(self):
-        print "DEBUG sleep:", SLEEP_TIME, "seconds"
-        time.sleep(SLEEP_TIME)
 
     def request_github(self, search_string):
         while True:

@@ -1,5 +1,7 @@
 import shutil
 import os
+import subprocess
+import threading
 
 
 def onerror(func, path, exc_info):
@@ -23,7 +25,34 @@ def onerror(func, path, exc_info):
 
 class Functions(object):
 
+    def __init__(self):
+        self.output = None
+        self.process = None
+
     @staticmethod
     def delete_repo(current_file):
         print "DEBUG: Deleting", current_file
         shutil.rmtree(current_file, onerror=onerror)
+
+    def run(self, timeout, cmd):
+        self.output = None
+        self.process = None
+        timeout = float(timeout)
+        def target():
+            print 'Thread started'
+            self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+            temp = self.process.communicate()
+            self.output = temp[0]
+            print 'Thread finished'
+
+        thread = threading.Thread(target=target)
+        thread.start()
+        thread.join(timeout)
+        if thread.is_alive():
+            print 'Terminating process : TIMEOUT'
+            self.process.terminate()
+
+            thread.join()
+            print 'terminated'
+
+        return self.output

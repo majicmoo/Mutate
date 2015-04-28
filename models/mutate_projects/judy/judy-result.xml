@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet type="text/xsl" href="result-xslt/result-xslt.xml"?><result>
+  <!-- summary -->
+  <summary>
+    <date>14:31:49</date>
+    <time>14:31:49</time>
+    <duration>0.00</duration>
+    <testsCount>0</testsCount>
+  </summary>
+  <!-- mutation operators -->
+  <operators>
+    <operator>
+      <name>a</name>
+      <description>replace basic binary arithmetic instructions with ADD</description>
+    </operator>
+    <operator>
+      <name>b</name>
+      <description>replace basic binary arithmetic instructions with DIV</description>
+    </operator>
+    <operator>
+      <name>c</name>
+      <description>replace basic binary arithmetic instructions with their left operands</description>
+    </operator>
+    <operator>
+      <name>d</name>
+      <description>replace basic binary arithmetic instructions with MUL</description>
+    </operator>
+    <operator>
+      <name>e</name>
+      <description>replace basic binary arithmetic instructions with REM</description>
+    </operator>
+    <operator>
+      <name>f</name>
+      <description>replace basic binary arithmetic instructions with their right operands</description>
+    </operator>
+    <operator>
+      <name>g</name>
+      <description>replace basic binary arithmetic instructions with SUB</description>
+    </operator>
+    <operator>
+      <name>a</name>
+      <description>replace jump instructions with IFEQ (IF_ICMPEQ, IF_ACMPEQ)</description>
+    </operator>
+    <operator>
+      <name>b</name>
+      <description>replace jump instructions with IFGE (IF_ICMPGE)</description>
+    </operator>
+    <operator>
+      <name>c</name>
+      <description>replace jump instructions with IFGT (IF_ICMPGT)</description>
+    </operator>
+    <operator>
+      <name>d</name>
+      <description>replace jump instructions with IFLE (IF_ICMPLE)</description>
+    </operator>
+    <operator>
+      <name>e</name>
+      <description>replace jump instructions with IFLT (IF_ICMPLT)</description>
+    </operator>
+    <operator>
+      <name>f</name>
+      <description>replace jump instructions with IFNE (IF_ICMPNE, IF_ACMPNE)</description>
+    </operator>
+    <operator>
+      <name>g</name>
+      <description>replace jump instruction IFNULL with IFNONNULL and vice-versa</description>
+    </operator>
+    <operator>
+      <name>a</name>
+      <description>replace binary logical instructions with AND</description>
+    </operator>
+    <operator>
+      <name>b</name>
+      <description>replace binary logical instructions with their left operands</description>
+    </operator>
+    <operator>
+      <name>c</name>
+      <description>replace binary logical instructions with OR</description>
+    </operator>
+    <operator>
+      <name>d</name>
+      <description>replace binary logical instructions with their right operands</description>
+    </operator>
+    <operator>
+      <name>e</name>
+      <description>replace binary logical instructions with XOR</description>
+    </operator>
+    <operator>
+      <name>a</name>
+      <description>replace shift instructions with their left operands</description>
+    </operator>
+    <operator>
+      <name>b</name>
+      <description>replace shift instructions with SHL</description>
+    </operator>
+    <operator>
+      <name>c</name>
+      <description>replace shift instructions with SHR</description>
+    </operator>
+    <operator>
+      <name>d</name>
+      <description>replace shift instructions with USHR</description>
+    </operator>
+    <operator>
+      <name>a</name>
+      <description>delete overriding method</description>
+    </operator>
+    <operator>
+      <name>b</name>
+      <description>relocate calls to overridden method</description>
+    </operator>
+    <operator>
+      <name>c</name>
+      <description>rename overridden method</description>
+    </operator>
+    <operator>
+      <name>f</name>
+      <description>delete super constructor call</description>
+    </operator>
+    <operator>
+      <name>i</name>
+      <description>delete super keyword before fields and methods calls</description>
+    </operator>
+    <operator>
+      <name>j</name>
+      <description>insert super keyword before fields and methods calls</description>
+    </operator>
+    <operator>
+      <name>a</name>
+      <description>change order or number of arguments in method invocations</description>
+    </operator>
+    <operator>
+      <name>b</name>
+      <description>delete overloading method declarations, one at a time</description>
+    </operator>
+    <operator>
+      <name>d</name>
+      <description>change overloading method</description>
+    </operator>
+    <operator>
+      <name>e</name>
+      <description>change local variable type to super class of original type</description>
+    </operator>
+    <operator>
+      <name>f</name>
+      <description>call new with child class type</description>
+    </operator>
+    <operator>
+      <name>i</name>
+      <description>change parameter type to super class of original type</description>
+    </operator>
+    <operator>
+      <name>j</name>
+      <description>change operands of reference assignment</description>
+    </operator>
+    <operator>
+      <name>a</name>
+      <description>change an accessor method name to other compatible accessor method names</description>
+    </operator>
+    <operator>
+      <name>b</name>
+      <description>change a modifier method name to other compatible modifier method names</description>
+    </operator>
+    <operator>
+      <name>c</name>
+      <description>replace reference assignment with content assignment (clone) and vice-versa</description>
+    </operator>
+    <operator>
+      <name>d</name>
+      <description>replace reference comparison with content comparison (equals) and vice-versa</description>
+    </operator>
+    <operator>
+      <name>e</name>
+      <description>delete the implemented default constructor</description>
+    </operator>
+    <operator>
+      <name>f</name>
+      <description>delete field initialization</description>
+    </operator>
+    <operator>
+      <name>j</name>
+      <description>delete this keyword when field has the same name as parameter</description>
+    </operator>
+    <operator>
+      <name>k</name>
+      <description>insert this keyword when field has the same name as parameter</description>
+    </operator>
+    <operator>
+      <name>a</name>
+      <description>Clears the collection</description>
+    </operator>
+    <operator>
+      <name>q</name>
+      <description>Reverses the list</description>
+    </operator>
+    <operator>
+      <name>k</name>
+      <description>Shuffles the list</description>
+    </operator>
+    <operator>
+      <name>h</name>
+      <description>Duplicates element in the list</description>
+    </operator>
+    <operator>
+      <name>n</name>
+      <description>Reverses the order of collections with ordering based on comparator</description>
+    </operator>
+    <operator>
+      <name>d</name>
+      <description>Changes LinkedHashSet to HashSet to shuffle order of elements in LinkedHashSet</description>
+    </operator>
+  </operators>
+  <!-- initial tests -->
+  <tests/>
+</result>
